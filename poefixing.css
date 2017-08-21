@@ -1,0 +1,66 @@
+
+.icon-td {
+  position: relative;
+}
+
+.standing {
+  position: absolute;
+  left:0;
+  top:5%;
+  height: 110%;
+  width: 5px;
+  background: rgba(255,255,255,0.2);
+}
+
+.standing .up, .standing .down {
+  width: 5px;
+}
+
+.standing .up {
+   background:#5da423;
+}
+
+.standing .down {
+   background:#af6025;
+}
+
+.fixdown, .fixup {
+    padding: 0 5px 0 15px;
+  position: relative;
+    cursor: pointer;
+}
+
+.fixup {
+ color :#5da423;
+}
+
+.fixdown {
+ color :#af6025;
+}
+
+.fixdown::before, .fixup::before {
+position: absolute;
+left:0;
+top:0;
+font-size: 20px;
+top: -7px;
+}
+
+.fixdown:hover, .fixup:hover {
+  color:#dcd3c3;*
+
+}
+
+.fixdown::before {
+content : ">";
+transform: rotatez(90deg);
+}
+
+.fixup::before {
+content : "<";
+transform: rotatez(90deg);
+}
+
+.fixingui {
+  display: inline-flex !important;
+}
