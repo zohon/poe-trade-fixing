@@ -1,4 +1,6 @@
 
+console.log("chrome runtime id", chrome.runtime.id);
+
 function InitializeAll() {
   $('.item').each(function(index, element) {
     //console.log($(element).attr("data-seller"));
@@ -138,6 +140,35 @@ var timerAction = 300;
 var firstAction = null;
 var limitNumberAction = 0;
 
+var myExtensionId = null;
+
+chrome.storage.local.get('myExtensionId', function(result) {
+  if (!result.myExtensionId) {
+      myExtensionId = uuidv4();
+      chrome.storage.local.set({
+        'myExtensionId': myExtensionId
+      }, function() {
+        // Notify that we saved.
+        console.log('Settings saved myExtensionId', myExtensionId);
+        getMyKarma();
+      });
+  } else {
+    myExtensionId = result.myExtensionId;
+    console.log('myExtensionId = ', myExtensionId);
+    getMyKarma();
+  }
+});
+
+
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+
 // chrome.storage.local.set({
 //   'myKarma': myKarma
 // }, function() {
@@ -195,13 +226,22 @@ firebase.initializeApp(config);
 
 var database = firebase.database();
 
+function getMyKarma(){
+  var starCountRef = firebase.database().ref('users/'+myExtensionId);
+  starCountRef.on('value', function(snapshot) {
+    if(snapshot.val()) {
+      myKarma = snapshot.val();
+      console.log("getMyKarma",snapshot.val());
+    }
+  });
+}
+
 var starCountRef = firebase.database().ref('IGN');
 starCountRef.on('value', function(snapshot) {
   if(snapshot.val()) {
     listIgn = snapshot.val();
     update(snapshot.val());
   }
-
 });
 
 var globalListen = "";
@@ -217,7 +257,6 @@ $('form').submit(function(e) {
 });
 
 $('.loader').bind('DOMNodeInserted DOMNodeRemoved',function(){ // when tere is change on the request
-
       if(globalListen) {
         clearTimeout(globalListen);
       }
@@ -353,6 +392,9 @@ function saveLocalKarma(karma) {
     // Notify that we saved.
     console.log('Settings saved myKarma', myKarma);
   });
+
+  var updates = myKarma;
+  firebase.database().ref("users/" + myExtensionId).update(updates);
 }
 
 
