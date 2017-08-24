@@ -4,25 +4,25 @@ console.log("chrome runtime id", chrome.runtime.id);
 // Initialize Firebase
 
 // DEV
-var config = {
-  apiKey: "AIzaSyD9z6wR2rOlHl-qmdp7Ec302lwsE4hhJSA",
-  authDomain: "poe-fixing-dev.firebaseapp.com",
-  databaseURL: "https://poe-fixing-dev.firebaseio.com",
-  projectId: "poe-fixing-dev",
-  storageBucket: "poe-fixing-dev.appspot.com",
-  messagingSenderId: "628753270892"
-};
-
+// var config = {
+//   apiKey: "AIzaSyD9z6wR2rOlHl-qmdp7Ec302lwsE4hhJSA",
+//   authDomain: "poe-fixing-dev.firebaseapp.com",
+//   databaseURL: "https://poe-fixing-dev.firebaseio.com",
+//   projectId: "poe-fixing-dev",
+//   storageBucket: "poe-fixing-dev.appspot.com",
+//   messagingSenderId: "628753270892"
+// };
+//
 
 // PROD
-// var config = {
-//   apiKey: "AIzaSyAk3-WQr75K4qmu8oy70KrNkmm0TsmUQ1Y",
-//   authDomain: "poe-fixing.firebaseapp.com",
-//   databaseURL: "https://poe-fixing.firebaseio.com",
-//   projectId: "poe-fixing",
-//   storageBucket: "poe-fixing.appspot.com",
-//   messagingSenderId: "150775083928"
-// };
+var config = {
+  apiKey: "AIzaSyAk3-WQr75K4qmu8oy70KrNkmm0TsmUQ1Y",
+  authDomain: "poe-fixing.firebaseapp.com",
+  databaseURL: "https://poe-fixing.firebaseio.com",
+  projectId: "poe-fixing",
+  storageBucket: "poe-fixing.appspot.com",
+  messagingSenderId: "150775083928"
+};
 firebase.initializeApp(config);
 
 
