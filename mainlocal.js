@@ -1,31 +1,6 @@
 
 console.log("chrome runtime id", chrome.runtime.id);
 
-// Initialize Firebase
-
-// DEV
-var config = {
-  apiKey: "AIzaSyD9z6wR2rOlHl-qmdp7Ec302lwsE4hhJSA",
-  authDomain: "poe-fixing-dev.firebaseapp.com",
-  databaseURL: "https://poe-fixing-dev.firebaseio.com",
-  projectId: "poe-fixing-dev",
-  storageBucket: "poe-fixing-dev.appspot.com",
-  messagingSenderId: "628753270892"
-};
-
-
-// PROD
-// var config = {
-//   apiKey: "AIzaSyAk3-WQr75K4qmu8oy70KrNkmm0TsmUQ1Y",
-//   authDomain: "poe-fixing.firebaseapp.com",
-//   databaseURL: "https://poe-fixing.firebaseio.com",
-//   projectId: "poe-fixing",
-//   storageBucket: "poe-fixing.appspot.com",
-//   messagingSenderId: "150775083928"
-// };
-firebase.initializeApp(config);
-
-
 function InitializeAll() {
   $('.item').each(function(index, element) {
     //console.log($(element).attr("data-seller"));
@@ -33,69 +8,10 @@ function InitializeAll() {
       return;
     }
     $(element).addClass('antifixing');
-
-
-    var select = document.createElement('select');
-    $('select').addClass('report');
-    var option = document.createElement('option');
-    $(option).attr('value', null);
-    $(option).html("Report account");
-    $(select).append(option);
-    $.each(["Price fixing", "AFK"], function(index, data) {
-          var option = document.createElement('option');
-          $(option).attr('value', data);
-          $(option).html(data);
-          $(select).append(option);
-    })
-    $(element).find('.third-cell').html(select);
     $(element).find('.icon-td').append('<div class="standing"><div class="up"></div><div class="down"></div></div>');
     $(element).find('.bottom-row .proplist').append("<li class='whisper-count'>0</li><li class='fixingui'><div class='fixup'><span class='count'>0</span></div></li><li class='fixingui'><div class='fixdown'><span class='count'>0</span></div></li>");
   });
 
-
-  $('.report').change(function(e) {
-
-    if (e.originalEvent === undefined) {
-      return;
-    }
-
-    //Some code
-    if ("isTrusted" in e) {
-      if (!event.isTrusted) {
-        return;
-      }
-    }
-
-    var reportInfo = $(this).val();
-
-    if(reportInfo == "Report account") {
-      return
-    }
-
-    var ign = $(e.target).closest('.item').attr('data-seller');
-
-    // Write the new post's data simultaneously in the posts list and the user's post list.
-    var updates = {
-    };
-
-    if(alreadyReported[ign]) {
-
-      if (alreadyReported[ign][reportInfo]) {
-        showInfo('You have already voted reported&nbsp;<b>'+ign+'</b>&nbsp;for&nbsp;<b>'+reportInfo+'</b>');
-        return;
-      } else {
-        $.each(alreadyReported[ign], function(index, data) {
-          var count = (listIgn[ign] && listIgn[ign]['report'] && listIgn[ign]['report'][index] ? listIgn[ign]['report'][index] - 1 : 0);
-          updates[index] = count;
-        });
-      }
-
-    }
-    var count = (listIgn[ign] && listIgn[ign]['report'] && listIgn[ign]['report'][reportInfo] ? listIgn[ign]['report'][reportInfo] + 1 : 1);
-    updates[reportInfo] = count;
-    saveLocalReport(ign, updates);
-    firebase.database().ref("IGN/" + ign + "/report").update(updates);
-  });
 
   $('.fixup').click(function(e) {
 
@@ -123,14 +39,8 @@ function InitializeAll() {
       //   return;
       // }
 
-      saveLocal(ign);
+      saveLocal(ign, 'up');
       saveLocalKarma("up");
-      var count = (listIgn[ign] && listIgn[ign]['up'] ? listIgn[ign]['up'] + 1 : 1);
-      // Write the new post's data simultaneously in the posts list and the user's post list.
-      var updates = {
-        up: count
-      };
-      firebase.database().ref("IGN/" + ign).update(updates);
     }
 
   });
@@ -163,7 +73,6 @@ function InitializeAll() {
         }
 
         saveWhisper(name);
-        firebase.database().ref("IGN/" + ign + "/items/" + name).update(updates);
       }
     });
 
@@ -197,15 +106,8 @@ function InitializeAll() {
         return;
       }
 
-      saveLocal(ign);
+      saveLocal(ign, 'down');
       saveLocalKarma("down");
-
-      var count = (listIgn[ign] && listIgn[ign]['down'] ? listIgn[ign]['down'] + 1 : 1);
-      // Write the new post's data simultaneously in the posts list and the user's post list.
-      var updates = {
-        down: count
-      };
-      firebase.database().ref("IGN/" + ign).update(updates);
     }
   });
 
@@ -215,7 +117,6 @@ InitializeAll();
 
 var listIgn = {};
 var alreadyVoted = [];
-var alreadyReported = {};
 var myKarma = {
   up : 0,
   down : 0
@@ -272,24 +173,10 @@ function uuidv4() {
 //   console.log('Settings saved alreadyWhisper', alreadyWhisper);
 // });
 
-// chrome.storage.local.set({
-//   'alreadyReported': {}
-// }, function() {
-//   // Notify that we saved.
-//   console.log('Settings saved alreadyReported', alreadyReported);
-// });
-
 chrome.storage.local.get('myKarma', function(result) {
   if (result.myKarma) {
     myKarma = result.myKarma;
     console.log(myKarma);
-  }
-});
-
-chrome.storage.local.get('alreadyReported', function(result) {
-  if (result.alreadyReported) {
-    alreadyReported = result.alreadyReported;
-    console.log("alreadyReported",alreadyReported);
   }
 });
 
@@ -309,22 +196,27 @@ chrome.storage.local.get('alreadyWhisper', function(result) {
   }
 });
 
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyAk3-WQr75K4qmu8oy70KrNkmm0TsmUQ1Y",
+  authDomain: "poe-fixing.firebaseapp.com",
+  databaseURL: "https://poe-fixing.firebaseio.com",
+  projectId: "poe-fixing",
+  storageBucket: "poe-fixing.appspot.com",
+  messagingSenderId: "150775083928"
+};
+firebase.initializeApp(config);
+
 var database = firebase.database();
 
 function getMyKarma(){
   var starCountRef = firebase.database().ref('users/'+myExtensionId);
-
   starCountRef.on('value', function(snapshot) {
     if(snapshot.val()) {
       myKarma = snapshot.val();
       console.log("getMyKarma",snapshot.val());
-    }else {
-      console.log('nothing in users/'+myExtensionId);
     }
-  }, function(error) {
-    console.error(error);
   });
-
 }
 
 var starCountRef = firebase.database().ref('IGN');
@@ -332,11 +224,7 @@ starCountRef.on('value', function(snapshot) {
   if(snapshot.val()) {
     listIgn = snapshot.val();
     update(snapshot.val());
-  } else {
-    console.log('nothing in IGN');
   }
-}, function(error) {
-  console.error(error);
 });
 
 var globalListen = "";
@@ -364,16 +252,8 @@ $('.loader').bind('DOMNodeInserted DOMNodeRemoved',function(){ // when tere is c
       }, 200);
 });
 
-var somethingWrong = setTimeout(function() {
-  showInfo("Extension poe fixing has reached its peak connections limit");
-}, 4000);
 
 function update(datas) {
-
-  if(somethingWrong) {
-    clearTimeout(somethingWrong);
-  }
-
   $.each(datas, function(ign, value) {
 
     if($('.item[data-seller="' + ign + '"]').find('.fixup .count').html() != value.up) {
@@ -483,20 +363,6 @@ function saveLocal(ign) {
     // Notify that we saved.
     console.log('Settings saved alreadyVoted', alreadyVoted);
   });
-}
-
-function saveLocalReport(ign, report) {
-
-  //alreadyReported.push({ ign: ign, report: report });
-  alreadyReported[ign] = report;
-
-  chrome.storage.local.set({
-    'alreadyReported': alreadyReported
-  }, function() {
-    // Notify that we saved.
-    console.log('Settings saved alreadyReported', alreadyReported);
-  });
-
 }
 
 function saveLocalKarma(karma) {
