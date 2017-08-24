@@ -64,3 +64,49 @@ transform: rotatez(90deg);
 .fixingui {
   display: inline-flex !important;
 }
+
+.infoTicker {
+  position: fixed;
+  bottom: 0;
+  left: calc(50% - 380px);
+  width: 350px;
+  padding: 15px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  color: #fff;
+  animation-duration: 0.5s;
+  animation-name: slidein;
+  animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  white-space: nowrap;
+  animation-fill-mode: forwards;
+}
+
+.infoTicker.hideme {
+  animation-duration: 0.5s;
+  animation-name: slideout;
+  animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideout {
+  0% {
+    bottom:0px;
+  }
+
+  to {
+    bottom:-50px;
+  }
+}
+
+@keyframes slidein {
+  0% {
+    bottom:-50px;
+  }
+
+  to {
+    bottom:0;
+  }
+}
