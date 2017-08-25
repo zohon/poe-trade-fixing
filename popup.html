@@ -11,19 +11,32 @@
       body {
         font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
         font-size: 100%;
+        min-width:100px;
       }
-      #status {
-        /* avoid an excessively wide status text */
-        white-space: pre;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        max-width: 400px;
+      ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+      }
+      li {
+        list-style: none;
       }
     </style>
     <!-- <script src="popup.js"></script> -->
   </head>
   <body>
-    <div id="status"></div>
-    POE anti fixing
+    <ul>
+      <li>
+        <input type="checkbox" id="whisper"></input><label for="whisper">whisper</label>
+      </li>
+      <li>
+        <input type="checkbox" id="vote"></input><label for="vote">vote</label>
+      </li>
+      <li>
+        <input type="checkbox" id="report"></input><label for="report">report</label>
+      </li>
+    </ul>
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="popup.js"></script>
   </body>
 </html>

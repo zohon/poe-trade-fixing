@@ -3,7 +3,7 @@
 
   "name": "poe.trade price fixing",
   "description": "This extension show the rating of a seller in poe.trade",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "incognito": "spanning",
   "browser_action": {
     "default_icon": "icon.png",

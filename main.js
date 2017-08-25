@@ -1,5 +1,93 @@
-
 console.log("chrome runtime id", chrome.runtime.id);
+
+var parameters = [];
+// chrome.storage.local.set({
+//   'parameters': parameters
+// }, function() {
+//   // Notify that we saved.
+//   console.log('Settings saved parameters', parameters);
+// });
+
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    // console.log(sender.tab ?
+    //             "from a content script:" + sender.tab.url :
+    //             "from the extension");
+    if (!sender.tab && request.toggle) {
+
+      if(parameters.indexOf(request.toggle) >= 0) {
+        parameters.splice(parameters.indexOf(request.toggle), 1);
+      } else {
+        parameters.push(request.toggle);
+      }
+
+      activeParameters(parameters);
+    }
+
+});
+
+
+
+function activeParameters(parameters) {
+  console.log(parameters);
+  if(parameters.indexOf('vote') >= 0 ) {
+    $('.fixup').closest('li').removeClass('hidden');
+    $('.fixdown').closest('li').removeClass('hidden');
+  } else {
+    $('.fixup').closest('li').addClass('hidden');
+    $('.fixdown').closest('li').addClass('hidden');
+  }
+
+  if(parameters.indexOf('whisper') >= 0 ) {
+    $('.whisper-count').closest('li').removeClass('hidden');
+  } else {
+    $('.whisper-count').closest('li').addClass('hidden');
+  }
+
+  if(parameters.indexOf('report') >= 0 ) {
+    $('.report').removeClass('hidden');
+  } else {
+    $('.report').addClass('hidden');
+  }
+
+  // switch (parameters) {
+  //   case "vote":
+  //     if ($('.fixup').closest('li').hasClass('hidden')) {
+  //       $('.fixup').closest('li').removeClass('hidden');
+  //     } else {
+  //       $('.fixup').closest('li').addClass('hidden');
+  //     }
+  //     if ($('.fixdown').closest('li').hasClass('hidden')) {
+  //       $('.fixdown').closest('li').removeClass('hidden');
+  //     } else {
+  //       $('.fixdown').closest('li').addClass('hidden');
+  //     }
+  //     break;
+  //   case "whisper":
+  //     if ($('.whisper-count').closest('li').hasClass('hidden')) {
+  //       $('.whisper-count').closest('li').removeClass('hidden');
+  //     } else {
+  //       $('.whisper-count').closest('li').addClass('hidden');
+  //     }
+  //     break;
+  //   case "report":
+  //     if ($('.report').hasClass('hidden')) {
+  //       $('.report').removeClass('hidden');
+  //     } else {
+  //       $('.report').addClass('hidden');
+  //     }
+  //     break;
+  // }
+}
+
+var parameters = [];
+
+chrome.storage.sync.get('parameters', function(result) {
+  if (result.parameters) {
+    parameters = result.parameters;
+    activeParameters(parameters);
+  }
+});
 
 // Initialize Firebase
 
@@ -29,7 +117,7 @@ firebase.initializeApp(config);
 function InitializeAll() {
   $('.item').each(function(index, element) {
     //console.log($(element).attr("data-seller"));
-    if($(element).hasClass('antifixing')) {
+    if ($(element).hasClass('antifixing')) {
       return;
     }
     $(element).addClass('antifixing');
@@ -42,10 +130,10 @@ function InitializeAll() {
     $(option).html("Report account");
     $(select).append(option);
     $.each(["Price fixing", "AFK"], function(index, data) {
-          var option = document.createElement('option');
-          $(option).attr('value', data);
-          $(option).html(data);
-          $(select).append(option);
+      var option = document.createElement('option');
+      $(option).attr('value', data);
+      $(option).html(data);
+      $(select).append(option);
     })
     $(element).find('.third-cell').html(select);
     $(element).find('.icon-td').append('<div class="standing"><div class="up"></div><div class="down"></div></div>');
@@ -68,20 +156,19 @@ function InitializeAll() {
 
     var reportInfo = $(this).val();
 
-    if(reportInfo == "Report account") {
+    if (reportInfo == "Report account") {
       return
     }
 
     var ign = $(e.target).closest('.item').attr('data-seller');
 
     // Write the new post's data simultaneously in the posts list and the user's post list.
-    var updates = {
-    };
+    var updates = {};
 
-    if(alreadyReported[ign]) {
+    if (alreadyReported[ign]) {
 
       if (alreadyReported[ign][reportInfo]) {
-        showInfo('You have already voted reported&nbsp;<b>'+ign+'</b>&nbsp;for&nbsp;<b>'+reportInfo+'</b>');
+        showInfo('You have already voted reported&nbsp;<b>' + ign + '</b>&nbsp;for&nbsp;<b>' + reportInfo + '</b>');
         return;
       } else {
         $.each(alreadyReported[ign], function(index, data) {
@@ -115,8 +202,8 @@ function InitializeAll() {
       var ign = $(e.target).closest('.item').attr('data-seller');
 
       if (alreadyVoted.indexOf(ign) >= 0) {
-        console.log("alreadyVoted",ign, alreadyVoted);
-        showInfo('You have already voted for&nbsp;<b>'+ign+'</b>');
+        console.log("alreadyVoted", ign, alreadyVoted);
+        showInfo('You have already voted for&nbsp;<b>' + ign + '</b>');
         return;
       }
       // if(!checkActions()) {
@@ -188,12 +275,12 @@ function InitializeAll() {
 
 
       if (alreadyVoted.indexOf(ign) >= 0) {
-        console.log("alreadyVoted",ign, alreadyVoted);
-        showInfo('You have already voted for&nbsp;<b>'+ign+'</b>');
+        console.log("alreadyVoted", ign, alreadyVoted);
+        showInfo('You have already voted for&nbsp;<b>' + ign + '</b>');
         return;
       }
 
-      if(!checkActions()) {
+      if (!checkActions()) {
         return;
       }
 
@@ -217,8 +304,8 @@ var listIgn = {};
 var alreadyVoted = [];
 var alreadyReported = {};
 var myKarma = {
-  up : 0,
-  down : 0
+  up: 0,
+  down: 0
 };
 
 var timerAction = 300;
@@ -229,14 +316,14 @@ var myExtensionId = null;
 
 chrome.storage.local.get('myExtensionId', function(result) {
   if (!result.myExtensionId) {
-      myExtensionId = uuidv4();
-      chrome.storage.local.set({
-        'myExtensionId': myExtensionId
-      }, function() {
-        // Notify that we saved.
-        console.log('Settings saved myExtensionId', myExtensionId);
-        getMyKarma();
-      });
+    myExtensionId = uuidv4();
+    chrome.storage.local.set({
+      'myExtensionId': myExtensionId
+    }, function() {
+      // Notify that we saved.
+      console.log('Settings saved myExtensionId', myExtensionId);
+      getMyKarma();
+    });
   } else {
     myExtensionId = result.myExtensionId;
     console.log('myExtensionId = ', myExtensionId);
@@ -246,7 +333,8 @@ chrome.storage.local.get('myExtensionId', function(result) {
 
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    var r = Math.random() * 16 | 0,
+      v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
 }
@@ -289,7 +377,7 @@ chrome.storage.local.get('myKarma', function(result) {
 chrome.storage.local.get('alreadyReported', function(result) {
   if (result.alreadyReported) {
     alreadyReported = result.alreadyReported;
-    console.log("alreadyReported",alreadyReported);
+    console.log("alreadyReported", alreadyReported);
   }
 });
 
@@ -311,15 +399,15 @@ chrome.storage.local.get('alreadyWhisper', function(result) {
 
 var database = firebase.database();
 
-function getMyKarma(){
-  var starCountRef = firebase.database().ref('users/'+myExtensionId);
+function getMyKarma() {
+  var starCountRef = firebase.database().ref('users/' + myExtensionId);
 
   starCountRef.on('value', function(snapshot) {
-    if(snapshot.val()) {
+    if (snapshot.val()) {
       myKarma = snapshot.val();
-      console.log("getMyKarma",snapshot.val());
-    }else {
-      console.log('nothing in users/'+myExtensionId);
+      console.log("getMyKarma", snapshot.val());
+    } else {
+      console.log('nothing in users/' + myExtensionId);
     }
   }, function(error) {
     console.error(error);
@@ -329,7 +417,7 @@ function getMyKarma(){
 
 var starCountRef = firebase.database().ref('IGN');
 starCountRef.on('value', function(snapshot) {
-  if(snapshot.val()) {
+  if (snapshot.val()) {
     listIgn = snapshot.val();
     update(snapshot.val());
   } else {
@@ -341,27 +429,27 @@ starCountRef.on('value', function(snapshot) {
 
 var globalListen = "";
 $('form').submit(function(e) {
-  if(globalListen) {
+  if (globalListen) {
     clearTimeout(globalListen);
   }
   globalListen = setTimeout(function() {
-      InitializeAll();
-      update(listIgn);
-      globalListen = "";
+    InitializeAll();
+    update(listIgn);
+    globalListen = "";
   }, 2000);
 });
 
-$('.loader').bind('DOMNodeInserted DOMNodeRemoved',function(){ // when tere is change on the request
-      if(globalListen) {
-        clearTimeout(globalListen);
-      }
+$('.loader').bind('DOMNodeInserted DOMNodeRemoved', function() { // when tere is change on the request
+  if (globalListen) {
+    clearTimeout(globalListen);
+  }
 
-      globalListen = setTimeout(function() {
-          console.log("globalListen", "listen");
-          InitializeAll();
-          globalListen = "";
-          update(listIgn);
-      }, 200);
+  globalListen = setTimeout(function() {
+    console.log("globalListen", "listen");
+    InitializeAll();
+    globalListen = "";
+    update(listIgn);
+  }, 200);
 });
 
 var somethingWrong = setTimeout(function() {
@@ -370,17 +458,17 @@ var somethingWrong = setTimeout(function() {
 
 function update(datas) {
 
-  if(somethingWrong) {
+  if (somethingWrong) {
     clearTimeout(somethingWrong);
   }
 
   $.each(datas, function(ign, value) {
 
-    if($('.item[data-seller="' + ign + '"]').find('.fixup .count').html() != value.up) {
+    if ($('.item[data-seller="' + ign + '"]').find('.fixup .count').html() != value.up) {
       $('.item[data-seller="' + ign + '"]').find('.fixup .count').html(value.up);
     }
 
-    if($('.item[data-seller="' + ign + '"]').find('.fixdown .count').html() != value.down) {
+    if ($('.item[data-seller="' + ign + '"]').find('.fixdown .count').html() != value.down) {
       $('.item[data-seller="' + ign + '"]').find('.fixdown .count').html(value.down);
     }
 
@@ -442,8 +530,8 @@ function saveWhisper(ign) {
 
 function checkActions() {
 
-  if(!firstAction) {
-      firstAction = new Date();
+  if (!firstAction) {
+    firstAction = new Date();
   }
 
   limitNumberAction++;
@@ -455,22 +543,22 @@ function checkActions() {
     firstAction = new Date();
     limitNumberAction = 0;
     return true;
-  } else if(limitNumberAction <= 2) {
+  } else if (limitNumberAction <= 2) {
     return true;
   }
-  showInfo('Number of vote execed please wait&nbsp;<b>'+Math.round((300-getDiffSec(firstAction, myAction)))+"sec</b>");
+  showInfo('Number of vote execed please wait&nbsp;<b>' + Math.round((300 - getDiffSec(firstAction, myAction))) + "sec</b>");
   return false;
 }
 
 function getDiffSec(date1, date2) {
-var t1 = date1;
-var t2 = date2;
-var dif = t1.getTime() - t2.getTime();
+  var t1 = date1;
+  var t2 = date2;
+  var dif = t1.getTime() - t2.getTime();
 
-var Seconds_from_T1_to_T2 = dif / 1000;
-var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
+  var Seconds_from_T1_to_T2 = dif / 1000;
+  var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
 
-return parseFloat(Seconds_Between_Dates);
+  return parseFloat(Seconds_Between_Dates);
 }
 
 function saveLocal(ign) {
