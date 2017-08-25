@@ -49,35 +49,6 @@ function activeParameters(parameters) {
   } else {
     $('.report').addClass('hidden');
   }
-
-  // switch (parameters) {
-  //   case "vote":
-  //     if ($('.fixup').closest('li').hasClass('hidden')) {
-  //       $('.fixup').closest('li').removeClass('hidden');
-  //     } else {
-  //       $('.fixup').closest('li').addClass('hidden');
-  //     }
-  //     if ($('.fixdown').closest('li').hasClass('hidden')) {
-  //       $('.fixdown').closest('li').removeClass('hidden');
-  //     } else {
-  //       $('.fixdown').closest('li').addClass('hidden');
-  //     }
-  //     break;
-  //   case "whisper":
-  //     if ($('.whisper-count').closest('li').hasClass('hidden')) {
-  //       $('.whisper-count').closest('li').removeClass('hidden');
-  //     } else {
-  //       $('.whisper-count').closest('li').addClass('hidden');
-  //     }
-  //     break;
-  //   case "report":
-  //     if ($('.report').hasClass('hidden')) {
-  //       $('.report').removeClass('hidden');
-  //     } else {
-  //       $('.report').addClass('hidden');
-  //     }
-  //     break;
-  // }
 }
 
 var parameters = [];
@@ -236,7 +207,6 @@ function InitializeAll() {
     }
     var ign = $(e.target).closest('.item').attr('data-seller');
 
-
     $.each($(e.target).closest('.item')[0].className.split(" "), function(index, name) {
       if (name.indexOf('item-live-') >= 0) {
         var count = (listIgn[ign] && listIgn[ign]["items"] && listIgn[ign]["items"][name] && listIgn[ign]["items"][name].whisper ? listIgn[ign]["items"][name].whisper + 1 : 1);
@@ -250,7 +220,9 @@ function InitializeAll() {
         }
 
         saveWhisper(name);
-        firebase.database().ref("IGN/" + ign + "/items/" + name).update(updates);
+        setTimeout(function() {
+          firebase.database().ref("IGN/" + ign + "/items/" + name).update(updates);
+        },100);
       }
     });
 
@@ -456,6 +428,9 @@ var somethingWrong = setTimeout(function() {
   showInfo("Extension poe fixing has reached its peak connections limit");
 }, 4000);
 
+
+var alreadyknow = {};
+
 function update(datas) {
 
   if (somethingWrong) {
@@ -463,6 +438,12 @@ function update(datas) {
   }
 
   $.each(datas, function(ign, value) {
+
+    if(alreadyknow[ign] && alreadyknow[ign] == JSON.stringify(value)) {
+      return;
+    }
+
+    alreadyknow[ign] = JSON.stringify(value);
 
     if ($('.item[data-seller="' + ign + '"]').find('.fixup .count').html() != value.up) {
       $('.item[data-seller="' + ign + '"]').find('.fixup .count').html(value.up);
